@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use std::{collections::HashMap};
 
-use crate::player::{PlayerID};
+use crate::{player::PlayerID};
 
 type BitType = i128;
 pub type BoardType = i8;
@@ -14,20 +14,22 @@ pub enum Square {
 
 pub struct Board {
     grid: HashMap<PlayerID, BitType>,
-    size: BoardType
+    size: BoardType,
+    win_length: i8
 }
 
 impl Board {
     pub fn new(size: BoardType, players: Vec<PlayerID>) -> Self {
-        let grid: HashMap<i8, BitType> = players.into_iter().map(|p| (p, 0)).collect();
+        let grid: HashMap<PlayerID, BitType> = players.into_iter().map(|p| (p, 0)).collect();
         Self {
             grid: grid,
-            size: size
+            size: size,
+            win_length: 4
         }
     }
 
     fn outside_bounds(&self, coord: &Coord) -> bool {
-        return (coord.0 < 0 || coord.0 > self.size) || (coord.1 < 0 || coord.1 > self.size)
+        return (coord.0 < 0 || coord.0 >= self.size) || (coord.1 < 0 || coord.1 >= self.size)
     }
 
     fn coord_to_bit(&self, coord: &Coord) -> BitType {
@@ -42,6 +44,23 @@ impl Board {
             }
         }
         None
+    }
+
+    fn apply_bitwise_n_times(&self, board: BitType, offset: i8) -> bool {
+        let mut y = board;
+        for _ in 1..self.win_length {
+            y = y & (y << offset);
+            println!("{}", y)
+        }
+        y != 0
+    }
+    
+    fn is_win(&self, player_id: PlayerID) -> bool {
+        let board = self.grid[&player_id];
+        self.apply_bitwise_n_times(board, 1) || // horizontal win 
+        self.apply_bitwise_n_times(board, self.size) || // vertical win
+        self.apply_bitwise_n_times(board, self.size + 1) || // \ diagonal win
+        self.apply_bitwise_n_times(board, self.size - 1) // / diagonal win
     }
 
     pub fn get_tile(&self, coord: &Coord) -> Result<Square, String> {
@@ -65,6 +84,9 @@ impl Board {
 
         let coord_bit = self.coord_to_bit(coord);
         self.grid.insert(player_id, self.grid[&player_id] | coord_bit);
+        if self.is_win(player_id) {
+            return Err(format!("{} wins!", player_id))
+        }
         Ok(())
     }
 

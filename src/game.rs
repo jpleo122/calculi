@@ -11,8 +11,7 @@ pub struct GameState {
     players: HashMap<PlayerID, Player>,
     player_order: Vec<PlayerID>,
     player_idx: usize,
-    history: Vec<GameAction>,
-    win_length: i8,
+    history: Vec<GameAction>
 }
 
 impl GameState {
@@ -24,7 +23,7 @@ impl GameState {
         let players = players.into_iter().map(|p| (p.get_id(), p)).collect();
         let history = Vec::new();
 
-        Self { board, players, player_order, player_idx: 0, history, win_length: 5 }
+        Self { board, players, player_order, player_idx: 0, history }
     }
 
     fn execute(&mut self, action: &GameAction) -> Result<(), String>  {
@@ -62,6 +61,7 @@ impl GameState {
                 return Ok(());
             },
             Err(e) => {
+                println!("{}", self);
                 return Err(e);
             }
         }
