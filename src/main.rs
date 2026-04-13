@@ -24,9 +24,9 @@ fn main() {
         GameAction::PlaceTile { player: 0, coord: (0, 3) },
         GameAction::PlaceTile { player: 1, coord: (1, 3) },
         GameAction::PlaceTile { player: 0, coord: (0, 4) },
-        GameAction::PlaceTile { player: 0, coord: (0, 4) },
-        GameAction::PlaceTile { player: 0, coord: (0, 5) }
     ];
+
+    println!("{}", game);
 
     for action in actions {
         match game.dispatch(action) {

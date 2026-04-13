@@ -11,19 +11,20 @@ pub struct GameState {
     players: HashMap<PlayerID, Player>,
     player_order: Vec<PlayerID>,
     player_idx: usize,
-    history: Vec<GameAction>
+    history: Vec<GameAction>,
+    win_length: i8,
 }
 
 impl GameState {
 
     pub fn new(board_size: BoardType, players: Vec<Player>) -> Self {
 
-        let board = Board::new(board_size);
-        let player_order = players.iter().map(|p| p.get_id()).collect(); 
+        let player_order: Vec<PlayerID> = players.iter().map(|p| p.get_id()).collect(); 
+        let board = Board::new(board_size, player_order.clone());
         let players = players.into_iter().map(|p| (p.get_id(), p)).collect();
         let history = Vec::new();
 
-        Self { board, players, player_order, player_idx: 0, history }
+        Self { board, players, player_order, player_idx: 0, history, win_length: 5 }
     }
 
     fn execute(&mut self, action: &GameAction) -> Result<(), String>  {
