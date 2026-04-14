@@ -3,7 +3,7 @@ mod game;
 mod player;
 use owo_colors::{Style};
 
-use crate::{game::{GameAction, GameState}, player::Player};
+use crate::{game::{GameAction, GameState, GameResp, InvalidAction}, player::Player};
 
 fn main() {
     play_n_player_game(2)
@@ -36,10 +36,23 @@ fn play_n_player_game(num_players: i8) {
 
     for action in actions {
         match game.dispatch(action) {
-            Err(e) => {
-                panic!("{}", e)
+            Ok(r) => {
+                match r {
+                    GameResp::GameWinner { winner } => panic!("{} has won", winner),
+                    GameResp::GameDraw => panic!("Game drawn"),
+                    _ => {}
+                }
             },
-            _ => {}
+            Err(e) => {
+                match e {
+                    InvalidAction::NotCurrentPlayer { current_player } => {
+                        panic!("It is player {} turn", current_player)
+                    },
+                    InvalidAction::InvalidPlacement { msg } => {
+                        panic!("{}", msg)
+                    }
+                }
+            }
         };
     }
 }

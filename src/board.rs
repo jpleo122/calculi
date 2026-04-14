@@ -21,6 +21,7 @@ pub struct Board {
 impl Board {
     pub fn new(size: BoardType, players: Vec<PlayerID>) -> Self {
         let grid: HashMap<PlayerID, BitType> = players.into_iter().map(|p| (p, 0)).collect();
+        if size > 11 { panic!("Using i128, board can't be bigger currently!")}
         Self {
             grid: grid,
             size: size,
@@ -50,12 +51,11 @@ impl Board {
         let mut y = board;
         for _ in 1..self.win_length {
             y = y & (y << offset);
-            println!("{}", y)
         }
         y != 0
     }
     
-    fn is_win(&self, player_id: PlayerID) -> bool {
+    pub fn is_win(&self, player_id: PlayerID) -> bool {
         let board = self.grid[&player_id];
         self.apply_bitwise_n_times(board, 1) || // horizontal win 
         self.apply_bitwise_n_times(board, self.size) || // vertical win
@@ -84,9 +84,6 @@ impl Board {
 
         let coord_bit = self.coord_to_bit(coord);
         self.grid.insert(player_id, self.grid[&player_id] | coord_bit);
-        if self.is_win(player_id) {
-            return Err(format!("{} wins!", player_id))
-        }
         Ok(())
     }
 

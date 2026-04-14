@@ -6,12 +6,24 @@ pub enum GameAction {
     PlaceTile { player: PlayerID, coord: Coord }
 }
 
+pub enum GameResp {
+    GameWinner { winner: PlayerID },
+    GameDraw,
+    TurnCompleted
+}
+
+pub enum InvalidAction {
+    NotCurrentPlayer { current_player: PlayerID },
+    InvalidPlacement { msg: String }
+}
+
 pub struct GameState {
     board: Board,
     players: HashMap<PlayerID, Player>,
     player_order: Vec<PlayerID>,
     player_idx: usize,
-    history: Vec<GameAction>
+    history: Vec<GameAction>,
+    winner: Option<PlayerID>
 }
 
 impl GameState {
@@ -21,20 +33,28 @@ impl GameState {
         let player_order: Vec<PlayerID> = players.iter().map(|p| p.get_id()).collect(); 
         let board = Board::new(board_size, player_order.clone());
         let players = players.into_iter().map(|p| (p.get_id(), p)).collect();
-        let history = Vec::new();
+        let history: Vec<GameAction> = Vec::new();
 
-        Self { board, players, player_order, player_idx: 0, history }
+        Self { board, players, player_order, player_idx: 0, history, winner: None }
     }
 
-    fn execute(&mut self, action: &GameAction) -> Result<(), String>  {
+    fn execute(&mut self, action: &GameAction) -> Result<(), InvalidAction>  {
         match action {
             GameAction::PlaceTile { player, coord } => {
-                
-                if self.current_player() != *player {
-                    return Err(format!("It is Player {} turn", self.current_player()))
-                }
 
-                return self.board.place_tile(coord, *player);
+                if self.current_player() != *player {
+                    return Err(InvalidAction::NotCurrentPlayer { current_player: self.current_player() })
+                }
+                
+                match self.board.place_tile(coord, *player) {
+                    Ok(()) => {
+                        if self.board.is_win(*player) {
+                            self.winner = Some(*player);
+                        }
+                        Ok(())
+                    },
+                    Err(s) => Err(InvalidAction::InvalidPlacement { msg: s })
+                }
             }
         }
     }
@@ -51,20 +71,25 @@ impl GameState {
         self.player_idx = (self.player_idx + 1) % self.player_order.len()
     }
 
-    pub fn dispatch(&mut self, action: GameAction) -> Result<(), String> {
+    pub fn dispatch(&mut self, action: GameAction) -> Result<GameResp, InvalidAction> {
 
         match self.execute(&action) {
             Ok(()) => {
                 self.update_history(action);
+                if self.board.is_win(self.current_player()) {
+                    self.winner = Some(self.current_player());
+                    return Ok(GameResp::GameWinner { winner: self.current_player() })
+                }
                 self.next_player();
                 println!("{}", self);
-                return Ok(());
+                return Ok(GameResp::TurnCompleted)
             },
             Err(e) => {
                 println!("{}", self);
                 return Err(e);
             }
         }
+
     }
 }
 
