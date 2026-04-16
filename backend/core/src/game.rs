@@ -89,11 +89,9 @@ impl GameState {
                     return Ok(gr)
                 }
                 self.next_player();
-                println!("{}", self);
                 return Ok(GameResp::TurnCompleted)
             },
             Err(e) => {
-                println!("{}", self);
                 return Err(e);
             }
         }
@@ -146,5 +144,51 @@ impl fmt::Display for GameState {
             write!(f, "\n").expect("Not Written");
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{game::{GameAction, GameResp, GameState, InvalidAction}, player::Player};
+
+    
+    fn generate_test_actions(num_players: i8) -> Vec<GameAction> {
+        (0..6).into_iter().map(|y| {
+            (0..num_players).into_iter().map(|x| {
+                GameAction::PlaceTile { player: x, coord: (5 - y + x, y) } // / diagonal
+            }).collect::<Vec<GameAction>>()
+        }).flatten().collect()
+    }
+
+
+    #[test]
+    fn play_game() {
+
+        let num_players = 2;
+        let players = (0..num_players).into_iter().map(|idx| Player::new(idx)).collect();
+        
+        let mut game = GameState::new(11, players);
+        let actions = generate_test_actions(num_players);
+
+        for action in actions {
+            match game.dispatch(action) {
+                Ok(r) => {
+                    match r {
+                        GameResp::GameWinner { winner: _winner } => { return },
+                        _ => {}
+                    }
+                },
+                Err(e) => {
+                    match e {
+                        InvalidAction::NotCurrentPlayer { current_player } => {
+                            panic!("It is player {} turn", current_player)
+                        },
+                        InvalidAction::InvalidPlacement { msg } => {
+                            panic!("{}", msg)
+                        }
+                    }
+                }
+            };
+        }
     }
 }
