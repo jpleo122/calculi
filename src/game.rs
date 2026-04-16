@@ -95,6 +95,23 @@ impl GameState {
 
 impl fmt::Display for GameState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+        let mut potential_styles: Vec<Style> = vec![
+            Style::new().red(),
+            Style::new().green(),
+            Style::new().purple(),
+            Style::new().blue(),
+            Style::new().yellow(),
+            Style::new().cyan()
+        ];
+
+        let player_to_style: HashMap<PlayerID, Style> = self.player_order.iter().map(|p| {
+            match potential_styles.pop() {
+                Some(s) => (*p, s),
+                None => (*p, Style::new().white())
+            }
+        }).collect();
+
         let size = self.board.get_size();
 
         for x in 0..*size {
@@ -107,8 +124,8 @@ impl fmt::Display for GameState {
                                 write!(f, "o").expect("Not Written");
                             },
                             Square::Occupied(player_id) => {
-                                let p_style = match self.players.get(&player_id) {
-                                    Some(p) => p.get_style(),
+                                let p_style = match player_to_style.get(&player_id) {
+                                    Some(p) => *p,
                                     None => Style::new().black()
                                 };
                                 write!(f, "{}", "X".style(p_style)).expect("Not Written");

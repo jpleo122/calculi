@@ -1,7 +1,6 @@
 mod board;
 mod game;
 mod player;
-use owo_colors::{Style};
 
 use crate::{game::{GameAction, GameState, GameResp, InvalidAction}, player::Player};
 
@@ -22,10 +21,10 @@ fn generate_test_actions(num_players: i8) -> Vec<GameAction> {
 
 fn play_n_player_game(num_players: i8) {
     let players = vec![
-        Player::new(0, Style::new().red()),
-        Player::new(1, Style::new().green()),
-        // Player::new(2, Style::new().blue()),
-        // Player::new(3, Style::new().purple())
+        Player::new(0),
+        Player::new(1),
+        // Player::new(2),
+        // Player::new(3)
     ];
     
     
