@@ -19,7 +19,6 @@ pub enum InvalidAction {
 
 pub struct GameState {
     board: Board,
-    players: HashMap<PlayerID, Player>,
     player_order: Vec<PlayerID>,
     player_idx: usize,
     history: Vec<GameAction>,
@@ -32,10 +31,9 @@ impl GameState {
 
         let player_order: Vec<PlayerID> = players.iter().map(|p| p.get_id()).collect(); 
         let board = Board::new(board_size, player_order.clone());
-        let players = players.into_iter().map(|p| (p.get_id(), p)).collect();
         let history: Vec<GameAction> = Vec::new();
 
-        Self { board, players, player_order, player_idx: 0, history, winner: None }
+        Self { board, player_order, player_idx: 0, history, winner: None }
     }
 
     fn execute(&mut self, action: &GameAction) -> Result<(), InvalidAction>  {
@@ -71,14 +69,24 @@ impl GameState {
         self.player_idx = (self.player_idx + 1) % self.player_order.len()
     }
 
+    fn check_game_end_conditions(&mut self) -> Option<GameResp> {
+        if self.board.is_win(self.current_player()) {
+            self.winner = Some(self.current_player());
+            Some(GameResp::GameWinner { winner: self.current_player() })
+        } else if self.board.is_draw() {
+            Some(GameResp::GameDraw)
+        } else {
+            None
+        }
+    }
+
     pub fn dispatch(&mut self, action: GameAction) -> Result<GameResp, InvalidAction> {
 
         match self.execute(&action) {
             Ok(()) => {
                 self.update_history(action);
-                if self.board.is_win(self.current_player()) {
-                    self.winner = Some(self.current_player());
-                    return Ok(GameResp::GameWinner { winner: self.current_player() })
+                if let Some(gr) = self.check_game_end_conditions() {
+                    return Ok(gr)
                 }
                 self.next_player();
                 println!("{}", self);

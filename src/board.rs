@@ -54,6 +54,14 @@ impl Board {
         }
         y != 0
     }
+
+    pub fn is_draw(&self) -> bool {
+        let mut y = 0;
+        for i in self.grid.values() {
+            y = y | i;
+        }
+        y == BitType::MAX
+    }
     
     pub fn is_win(&self, player_id: PlayerID) -> bool {
         let board = self.grid[&player_id];

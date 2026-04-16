@@ -5,7 +5,7 @@ mod player;
 use crate::{game::{GameAction, GameState, GameResp, InvalidAction}, player::Player};
 
 fn main() {
-    play_n_player_game(2)
+    play_n_player_game(3)
 }
 
 fn generate_test_actions(num_players: i8) -> Vec<GameAction> {
@@ -20,13 +20,8 @@ fn generate_test_actions(num_players: i8) -> Vec<GameAction> {
 }
 
 fn play_n_player_game(num_players: i8) {
-    let players = vec![
-        Player::new(0),
-        Player::new(1),
-        // Player::new(2),
-        // Player::new(3)
-    ];
-    
+
+    let players = (0..num_players).into_iter().map(|idx| Player::new(idx)).collect();
     
     let mut game = GameState::new(11, players);
     let actions = generate_test_actions(num_players);
