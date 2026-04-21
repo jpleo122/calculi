@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt};
 use owo_colors::{OwoColorize, Style};
-use crate::{board::{Board, BoardType, Coord, Square}, player::{Player, PlayerID}};
+use crate::{api::calculi::board::{Board, BoardType, Coord, Square}, api::calculi::player::{Player, PlayerID}};
+
 
 pub enum GameAction {
     PlaceTile { player: PlayerID, coord: Coord }
@@ -149,7 +150,10 @@ impl fmt::Display for GameState {
 
 #[cfg(test)]
 mod tests {
-    use crate::{game::{GameAction, GameResp, GameState, InvalidAction}, player::Player};
+    use crate::{
+        api::calculi::game::{GameAction, GameResp, GameState, InvalidAction}, 
+        api::calculi::player::Player
+    };
 
     
     fn generate_test_actions(num_players: i8) -> Vec<GameAction> {

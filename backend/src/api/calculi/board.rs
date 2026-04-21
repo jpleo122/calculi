@@ -1,6 +1,6 @@
 use std::{collections::HashMap};
 
-use crate::{player::PlayerID};
+use crate::{api::calculi::player::PlayerID};
 
 type BitType = i128;
 pub type BoardType = i8;
