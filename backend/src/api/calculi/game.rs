@@ -1,6 +1,9 @@
 use std::{collections::HashMap, fmt};
 use owo_colors::{OwoColorize, Style};
-use crate::{api::calculi::board::{Board, BoardType, Coord, Square}, api::calculi::player::{Player, PlayerID}};
+use super::{
+    board::{Board, BoardType, Coord, Square}, 
+    player::{Player, PlayerID}
+};
 
 
 pub enum GameAction {
@@ -150,9 +153,9 @@ impl fmt::Display for GameState {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        api::calculi::game::{GameAction, GameResp, GameState, InvalidAction}, 
-        api::calculi::player::Player
+    use super::super::{
+        game::{GameAction, GameResp, GameState, InvalidAction}, 
+        player::Player
     };
 
     
