@@ -5,6 +5,7 @@ $$
 begin
     NEW.updated_at = now();
     return NEW;
+end;
 $$ language plpgsql;
 
 create or replace function trigger_updated_at(tablename regclass)

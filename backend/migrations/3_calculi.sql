@@ -1,6 +1,6 @@
 
 create table "calculi" (
-    calculi_id      uuid primary key                            gen_random_uuid(),
+    calculi_id      uuid primary key                            default gen_random_uuid(),
 
     win_length      int                             not null,
 

@@ -1,6 +1,6 @@
 create table "user" (
 
-    user_id         uuid primary key                gen_random_uuid(),
+    user_id         uuid primary key                default gen_random_uuid(),
 
     username        text                not null,
 
