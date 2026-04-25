@@ -2,6 +2,7 @@ use anyhow::Context;
 use argon2::{Argon2, PasswordHash, password_hash::{self, SaltString}};
 use axum::{Extension, Json, Router, routing::post};
 use serde::{Serialize, Deserialize};
+use ts_rs::TS;
 use crate::api::{Error, Result, ResultExt};
 use super::types::extractor::AuthUser;
 
@@ -14,29 +15,33 @@ pub fn router() -> Router {
         .route("/login", post(login_user))
 }
 
-#[derive(Serialize, Deserialize)]
-struct UserBody<T> {
-    user: T
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../../frontend/src/types/")]
+pub struct UserBody<T> {
+    pub user: T,
 }
 
-#[derive(Serialize, Deserialize)]
-struct User {
-    email: String,
-    token: String,
-    username: String
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../../frontend/src/types/")]
+pub struct User {
+    pub email: String,
+    pub token: String,
+    pub username: String,
 }
 
-#[derive(serde::Deserialize)]
-struct LoginUser {
-    email: String,
-    password: String
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../../frontend/src/types/")]
+pub struct LoginUser {
+    pub email: String,
+    pub password: String,
 }
 
-#[derive(Serialize, Deserialize)]
-struct NewUser {
-    email: String,
-    username: String,
-    password: String
+#[derive(Serialize, Deserialize, TS)]
+#[ts(export, export_to = "../../frontend/src/types/")]
+pub struct NewUser {
+    pub email: String,
+    pub username: String,
+    pub password: String,
 }
 
 async fn create_user(
