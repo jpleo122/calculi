@@ -42,6 +42,6 @@ pub async fn the_fun_begins(config: Config, db: PgPool) -> anyhow::Result<()> {
 fn api_router() -> Router {
     Router::new()
         .route("/health", get(|| async { "OK" }))
-        .nest("/g", calculi::router())
-        .nest("/u", user::router())
+        .nest("/calculi", calculi::router())
+        .nest("/user", user::router())
 }
